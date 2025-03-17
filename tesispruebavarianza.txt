@@ -1,0 +1,56 @@
+% Configura la carpeta donde están los archivos JSON
+folderPath = 'C:\Users\57317\Downloads\Dataset-20241105T000329Z-001\Dataset'; % Cambia esto a tu ruta de carpeta
+jsonFiles = dir(fullfile(folderPath, '*.json'));
+
+% Inicializar una estructura para almacenar los datos de cada letra
+letters = 'A':'Z'; % Ajusta si tienes una estructura diferente o más letras
+numLetters = length(letters);
+letterData = struct();
+
+% Inicializar matrices para almacenar los resultados finales
+finalMeans = zeros(numLetters, 1); % Promedio final de cada letra
+finalVariances = zeros(numLetters, 1); % Varianza final de cada letra
+
+% Procesar cada archivo JSON
+for k = 1:length(jsonFiles)
+    % Leer el archivo JSON
+    filePath = fullfile(folderPath, jsonFiles(k).name);
+    jsonData = jsondecode(fileread(filePath));
+    
+    % Extraer la letra a partir del nombre del archivo (asume que empieza con la letra)
+    letter = jsonFiles(k).name(1); % Ajustar si el nombre de archivo tiene otro formato
+    letterIndex = find(letters == letter);
+    
+    % Extraer los datos de EMG
+    emgData = jsonData.emg.data;
+    
+    % Verificar si ya existe la letra en la estructura
+    if ~isfield(letterData, letter)
+        letterData.(letter) = []; % Inicializa un campo vacío si es la primera vez que aparece la letra
+    end
+    
+    % Agregar los datos de EMG a la lista de datos de la letra correspondiente
+    letterData.(letter) = [letterData.(letter); emgData];
+end
+
+% Calcular el promedio y la varianza de cada letra
+for i = 1:numLetters
+    currentLetter = letters(i);
+    if isfield(letterData, currentLetter)
+        % Calcular la media y la varianza para las 30 muestras de cada canal de EMG
+        meanValues = mean(letterData.(currentLetter));
+        varianceValues = var(letterData.(currentLetter));
+        
+        % Almacenar los promedios y varianzas finales
+        finalMeans(i) = mean(meanValues); % Promedio general de los promedios de cada canal
+        finalVariances(i) = mean(varianceValues); % Promedio general de las varianzas de cada canal
+    end
+end
+
+% Mostrar los resultados finales
+disp('Promedio final de cada letra:');
+disp(array2table(finalMeans', 'VariableNames', cellstr(letters')));
+
+disp('Varianza final de cada letra:');
+disp(array2table(finalVariances', 'VariableNames', cellstr(letters')));
+
