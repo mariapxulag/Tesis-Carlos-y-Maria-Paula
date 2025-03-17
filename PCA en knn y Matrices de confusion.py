@@ -1,3 +1,4 @@
+#RESNET50
 #Trabajando con las 20 componentes de PCA en KNN
 #Curva de pérdida de entrenamiento
 #Matrices de Confusión
