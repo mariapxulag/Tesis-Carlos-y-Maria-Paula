@@ -1,3 +1,4 @@
+#RESNET50
 #Proyección PCA 3D Todas las letras, Primer dataset
 import torch
 import torchvision.models as models
